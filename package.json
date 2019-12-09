@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/aaronpio/tinyapp/issues"
   },
-  "homepage": "https://github.com/aaronpio/tinyapp#readme"
+  "homepage": "https://github.com/aaronpio/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
