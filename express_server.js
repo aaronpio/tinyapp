@@ -5,13 +5,21 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const generateRandomURL = () => {
-  const generatedURL = Math.random()
-    .toString(36)
-    .substring(7);
-  return generatedURL;
-};
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  let letterOrNumber;
+  let newRandomURL = "";
 
-console.log(generateRandomURL());
+  for (let i = 0; i < 6; i++) {
+    letterOrNumber = Math.round(Math.random());
+    if (letterOrNumber === 0) {
+      newRandomURL += letters[Math.floor(Math.random() * 25)];
+    } else {
+      newRandomURL += numbers[Math.floor(Math.random() * 9)];
+    }
+  }
+  return newRandomURL;
+};
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -26,12 +34,21 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  let newShortURL = generateRandomURL();
+  urlDatabase[newShortURL] = req.body.longURL;
+
+  console.log(urlDatabase);
+
+  res.redirect(`/urls/${newShortURL}`);
 });
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
