@@ -60,9 +60,15 @@ app.get("/", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  let urlToDelete = req.params.shortURL;
-  console.log(urlToDelete);
+  const urlToDelete = req.params.shortURL;
   delete urlDatabase[urlToDelete];
+  res.redirect("/urls");
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  const urlToEdit = req.params.shortURL;
+  const newLongURL = req.body.newLongURL;
+  urlDatabase[urlToEdit] = newLongURL;
   res.redirect("/urls");
 });
 
