@@ -19,10 +19,12 @@ app.use(
     keys: ["cold", "outside"]
   })
 );
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
+//Loads 'Create URL Page'
 app.get("/urls/new", (req, res) => {
   const currUser_id = req.session.user_id;
 
@@ -32,6 +34,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+//Loads 'Edit URL Page' for a specific shortURL
 app.get("/urls/:shortURL", (req, res) => {
   const currUser_id = req.session.user_id;
 
@@ -43,15 +46,13 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//Endpoint that sends shortURL links to go to their associated webpage (wired to clickable link on the shortURL)
 app.get("/u/:shortURL", (req, res) => {
   const currlongURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(currlongURL);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
+//Loads the main Urls index page; finds all URLs for current user and displays
 app.get("/urls", (req, res) => {
   const currUser_id = req.session.user_id;
 
@@ -64,6 +65,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//Loads Register Page for account creation
 app.get("/register", (req, res) => {
   const currUser_id = req.session.user_id;
 
@@ -74,6 +76,7 @@ app.get("/register", (req, res) => {
   res.render("registration", templateVars);
 });
 
+//Loads Login Page
 app.get("/login", (req, res) => {
   const currUser_id = req.session.user_id;
 
@@ -84,10 +87,12 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
+//Reroutes the home path to /urls
 app.get("/", (req, res) => {
   res.redirect("/urls");
 });
 
+//Wired to delete button to delete specific URL
 app.post("/urls/:shortURL/delete", (req, res) => {
   const currUser_id = req.session.user_id;
 
@@ -101,6 +106,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 });
 
+//Wired to Url Edit form to update a specific LongURL
 app.post("/urls/:shortURL", (req, res) => {
   const currUser_id = req.session.user_id;
 
@@ -115,6 +121,7 @@ app.post("/urls/:shortURL", (req, res) => {
   }
 });
 
+//Wired to register page form; checks that entered email is available, creates that accounts cookie
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -144,6 +151,7 @@ app.post("/register", (req, res) => {
   }
 });
 
+//Wired to login form; Checks that email exists in database, checks that password is correct for user, sets cookie
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -165,17 +173,17 @@ app.post("/login", (req, res) => {
   }
 });
 
+//Wired to logout button, deletes current account cookie
 app.post("/logout", (req, res) => {
   delete req.session.user_id;
   res.redirect("/login");
 });
 
+//Wired to create URL form; Creates the new URL object with a new ShortURL, LongURL and userID property. Send back to URl index page.
 app.post("/urls", (req, res) => {
   const currUser_id = req.session.user_id;
 
   let newShortURL = generateRandomURL();
-
-  urlDatabase[newShortURL] = {};
 
   urlDatabase[newShortURL] = {};
   urlDatabase[newShortURL]["longURL"] = req.body.longURL;
