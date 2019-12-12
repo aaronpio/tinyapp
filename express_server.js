@@ -3,6 +3,7 @@ const app = express();
 const PORT = process.env.port || 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,7 +42,6 @@ const urlsForUser = currentUserID => {
       currentUserURLs[urlID] = urlDatabase[urlID].longURL;
     }
   }
-  console.log(currentUserURLs);
   return currentUserURLs;
 };
 
@@ -56,18 +56,7 @@ const urlDatabase = {
   }
 };
 
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
-};
+const users = {};
 
 app.set("view engine", "ejs");
 
@@ -163,6 +152,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email || !password) {
     res.status(400);
@@ -181,12 +171,11 @@ app.post("/register", (req, res) => {
   users[id] = {
     id,
     email,
-    password
+    password: hashedPassword
   };
 
   res.cookie("user_id", id);
 
-  //console.log(users);
   res.redirect("/urls");
 });
 
@@ -202,7 +191,7 @@ app.post("/login", (req, res) => {
 
   const currentUser = users[Emailcheck.userID];
 
-  if (currentUser.password === password) {
+  if (bcrypt.compareSync(password, currentUser.password)) {
     res.cookie("user_id", Emailcheck.userID);
     res.redirect("/urls");
   } else {
@@ -223,13 +212,9 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[newShortURL] = {};
 
-  console.log(req.body.longURL);
-
   urlDatabase[newShortURL] = {};
   urlDatabase[newShortURL]["longURL"] = req.body.longURL;
   urlDatabase[newShortURL]["userID"] = currUser_id;
-
-  console.log(urlDatabase);
 
   res.redirect(`/urls/${newShortURL}`);
 });
