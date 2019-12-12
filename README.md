@@ -22,7 +22,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 #### And edit your long URL - Sometimes change is fun!
 
-!["And edit your long URL - Sometimes change is fun!"](https://github.com/aaronpio/tinyapp/blob/master/docs/edit-longURL.png?raw=true)
+!["You can edit your long URL - Sometimes change is fun!"](https://github.com/aaronpio/tinyapp/blob/master/docs/edit-longURL.png?raw=true)
 
 #### -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
