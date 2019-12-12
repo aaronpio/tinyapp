@@ -1,6 +1,10 @@
 const { assert } = require("chai");
 
-const { getUserByEmail } = require("../helpers.js");
+const {
+  generateRandomURL,
+  checkForEmail,
+  urlsForUser
+} = require("../helper.js");
 
 const testUsers = {
   userRandomID: {
@@ -17,8 +21,14 @@ const testUsers = {
 
 describe("getUserByEmail", function() {
   it("should return a user with valid email", function() {
-    const user = getUserByEmail("user@example.com", users);
+    const user = checkForEmail("user@example.com", testUsers);
     const expectedOutput = "userRandomID";
-    // Write your assert statement here
+    assert.strictEqual(user.userID, expectedOutput);
+  });
+
+  it("should fail and return false for existsAlready property", function() {
+    const user = checkForEmail("notInDB@example.com", testUsers);
+    const expectedOutput = false;
+    assert.isNotTrue(user.existsAlready, expectedOutput);
   });
 });

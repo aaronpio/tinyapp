@@ -1,4 +1,4 @@
-const { urlDatabase, users } = require("./database.js");
+const { urlDatabase } = require("./database.js");
 
 const generateRandomURL = () => {
   const letters = "abcdefghijklmnopqrstuvwxyz";
@@ -17,7 +17,7 @@ const generateRandomURL = () => {
   return newRandomURL;
 };
 
-const checkForEmail = email => {
+const checkForEmail = (email, users) => {
   for (const userID in users) {
     const currentUser = users[userID];
     if (currentUser.email === email) {
