@@ -34,9 +34,26 @@ const checkForEmail = email => {
   return { existsAlready: false };
 };
 
+const urlsForUser = currentUserID => {
+  let currentUserURLs = {};
+  for (const urlID in urlDatabase) {
+    if (urlDatabase[urlID].userID === currentUserID) {
+      currentUserURLs[urlID] = urlDatabase[urlID].longURL;
+    }
+  }
+  console.log(currentUserURLs);
+  return currentUserURLs;
+};
+
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW"
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW"
+  }
 };
 
 const users = {
@@ -69,14 +86,14 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     user: users[currUser_id],
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]
+    longURL: urlDatabase[req.params.shortURL].longURL
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  const currlongURL = urlDatabase[req.params.shortURL].longURL;
+  res.redirect(currlongURL);
 });
 
 app.get("/urls.json", (req, res) => {
@@ -86,9 +103,11 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const currUser_id = req.cookies["user_id"];
 
+  const currentUsersURLs = urlsForUser(currUser_id);
+
   let templateVars = {
     user: users[currUser_id],
-    urls: urlDatabase
+    urls: currentUsersURLs
   };
   res.render("urls_index", templateVars);
 });
@@ -118,16 +137,28 @@ app.get("/", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const currUser_id = req.cookies["user_id"];
+
   const urlToDelete = req.params.shortURL;
-  delete urlDatabase[urlToDelete];
-  res.redirect("/urls");
+
+  if (currUser_id === urlDatabase[urlToDelete].userID) {
+    delete urlDatabase[urlToDelete];
+    res.redirect("/urls");
+  }
+  res.send("Can't delete if not logged into user.");
 });
 
 app.post("/urls/:shortURL", (req, res) => {
+  const currUser_id = req.cookies["user_id"];
+
   const urlToEdit = req.params.shortURL;
   const newLongURL = req.body.newLongURL;
-  urlDatabase[urlToEdit] = newLongURL;
-  res.redirect("/urls");
+
+  if (currUser_id === urlDatabase[urlToEdit].userID) {
+    urlDatabase[urlToEdit].longURL = newLongURL;
+    res.redirect("/urls");
+  }
+  res.send("Can't edit if not logged into user.");
 });
 
 app.post("/register", (req, res) => {
@@ -186,8 +217,17 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  const currUser_id = req.cookies["user_id"];
+
   let newShortURL = generateRandomURL();
-  urlDatabase[newShortURL] = req.body.longURL;
+
+  urlDatabase[newShortURL] = {};
+
+  console.log(req.body.longURL);
+
+  urlDatabase[newShortURL] = {};
+  urlDatabase[newShortURL]["longURL"] = req.body.longURL;
+  urlDatabase[newShortURL]["userID"] = currUser_id;
 
   console.log(urlDatabase);
 
